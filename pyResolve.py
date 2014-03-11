@@ -12,16 +12,35 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Define the function
+# Download from raw.git a pre-prepared list of servers
+# Allows anyone to fork & update the list
 
-def resolver():
+def servlist():
+
+
+    import urllib.request
+
+    url = 'https://raw.github.com/andyharney/pyResolve/master/urllist.txt'
+    response = urllib.request.urlopen(url)
+    data = response.read()
+    dataString = data.decode('UTF-8')
+    serverList = dataString.splitlines()
+
+    resolver(serverList)
+
+def resolver(serverlist):
 
 
     # Import the modules
     import os.path
-    from urllib import request
+    from urllib import request, error
     from time import gmtime, strftime, sleep, time
     from random import choice
+
+    usr_log = int('0')
+    max_logs = int('0')
+    sleep_timer = int('0')
+    randserv = ''
 
     # Grab some info from the user
     while True:
@@ -33,17 +52,7 @@ def resolver():
         except ValueError:
             print('Hmmm.... please only enter whole numbers. E.g. 1, 2, 3 Not. 2.5, 3.3')
             continue
-    # Define the list of addresses (IPs) to resolve
-    res_serv = ['http://74.125.228.100',
-                 'http://74.125.224.72/',
-                 'http://173.194.115.23',
-                 'http://173.194.115.24',
-                 'http://173.194.115.31',
-                 'http://212.58.244.68',
-                 'http://212.58.244.69',
-                 'http://173.194.64.160',
-                 'http://134.170.188.84',
-                 'http://87.98.168.164']
+
     # Set a few vars, day or log_length not elegant
     logs = 0
     mins = 0
@@ -66,14 +75,14 @@ def resolver():
             try:
                 # Here we pick a server to resolve from res_servs
                 # If it resolves the time and url are logged
-                randserv = choice(res_serv)
-                request.urlopen(ranserv, timeout=2)
+                randserv = choice(serverlist)
+                request.urlopen(randserv, timeout=2)
                 outfile = open(outlog, 'a')
                 outfile.write(curtime + ' - Resolves - ' + randserv + '\n')
                 outfile.close()
             # Catch the unresolved url and log the url and time
             # Who knows the url might actually be down
-            except:
+            except error.URLError:
                 outfile = open(outlog, 'a')
                 outfile.write(curtime + ' - No Connection - ' + randserv + '\n')
                 outfile.close()
@@ -87,4 +96,4 @@ def resolver():
                 seconds = time() - start_time
                 print('Running for ' + str(int(seconds)) + ' seconds', end = '\r')
 
-resolver()
+servlist()
